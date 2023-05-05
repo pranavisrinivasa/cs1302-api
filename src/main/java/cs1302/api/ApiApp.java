@@ -102,6 +102,7 @@ public class ApiApp extends Application {
         Label instructions = new Label("Can't figure out what dish to make? \n Choose a category " +
             "and get a random dish that you \n can make along with its nutritional value");
 
+        searchButton.setDisable(true);
         banner.setPreserveRatio(true);
         banner.setFitWidth(640);
         imgLeft.setPreserveRatio(true);
@@ -120,14 +121,16 @@ public class ApiApp extends Application {
         //          CornerRadii.EMPTY, Insets.EMPTY)));
         instr.setStyle("-fx-background-color: #ffda7c;");
 
-        // some labels to display information
-        Label notice = new Label("Modify the starter code to suit your needs.");
         //make comboBox
         categoryComboBox.getItems().addAll("Dessert", "Seafood", "Side",
             "Starter", "Vegan", "Vegetarian");
         categoryComboBox.getSelectionModel().selectFirst();
-
+        categoryComboBox.setValue("Choose food group!");
         // setup scene
+        categoryComboBox.setOnAction(event -> {
+            searchButton.setDisable(false);
+        });
+
         bar.getChildren().addAll(categoryComboBox, searchButton);
         left.getChildren().addAll(mealLabel, dishImg);
         right.getChildren().addAll(resultLabel);
@@ -138,13 +141,13 @@ public class ApiApp extends Application {
         right.setAlignment(Pos.CENTER);
         bar.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(sp, spR);
-        root.getChildren().addAll(banner, instr, bar, hbox, notice);
-        scene = new Scene(root, 640, 700);
+        root.getChildren().addAll(banner, instr, bar, hbox);
+        scene = new Scene(root, 640, 680);
 
         // setup stage
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
-         stage.setResizable(false);
+        stage.setResizable(false);
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();
         stage.show();
