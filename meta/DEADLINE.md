@@ -14,18 +14,19 @@ Markdown is transformed into nice looking HTML.
 
 > **Also, include the GitHub `https` URL to your repository.**
 
-TODO WRITE / REPLACE
+This GUI prompts the user to select a food group. Based on what they select, it connects to themealdb API, which filters out a list of dishes that fall into that category. Then,
+    the program chooses a random dish from that filtered list and passes it on to the Edamam API, which uses the name of the dish to display its nutritional value. The two APIs are joined in a meaningful way to pick a random dish for the user based on what they want and gives them the nutritional value of the dish.
 
 ## Part 2: New
 
 > What is something new and/or exciting that you learned from working
 > on this project?
 
-TODO WRITE / REPLACE
-
+I learnt how to use user input to query the results into the api and connect two apis together. This was exciting and I look forward to applying these skills in future projects.
 ## Part 3: Retrospect
 
 > If you could start the project over from scratch, what do
 > you think might do differently and why?
 
-TODO WRITE / REPLACE
+I would plan my scene graph better before I started coding. I would have also done more research on my APIs to see what parameters they accept and how. I would also make my GUI
+    look more visually appealing.
