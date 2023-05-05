@@ -139,12 +139,12 @@ public class ApiApp extends Application {
         bar.setAlignment(Pos.CENTER);
         hbox.getChildren().addAll(sp, spR);
         root.getChildren().addAll(banner, instr, bar, hbox, notice);
-        scene = new Scene(root);
+        scene = new Scene(root, 640, 700);
 
         // setup stage
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
-        // stage.setResizable(false);
+         stage.setResizable(false);
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();
         stage.show();
@@ -212,61 +212,5 @@ public class ApiApp extends Application {
             });
 
     } // start
-    /*
-    public void handleSearch(ActionEvent event) {
-        query = categoryComboBox.getValue().toString();
-        System.out.println("User query: " + query);
-        try {
-            RandomRecipe randomDish = getRandomDish(query);
-            mealName = randomDish.getMeals().get(random.nextInt(size)).getStrMeal();
-            mealImg = randomDish.getMeals().get(random.nextInt(size)).getStrMealThumb();
-            mealLabel.setText(mealName);
-            EdamamResponse foodItem = getFoodItem(mealName);
-            String energy = ((Double) foodItem.hints.get(0).getFood().getNutrients()
-            .get("ENERC_KCAL")).intValue() + " kcal";
-            String protein = foodItem.getHints().get(0).getFood().getNutrients()
-            .get("PROCNT") + " g";
-            String fat = foodItem.getHints().get(0).getFood().getNutrients().get("FAT") + " g";
-            String carbs = foodItem.getHints().get(0).getFood().getNutrients().get("CHOCDF") + " g";
-            result = String.format("Energy: %s\nProtein: %s\nFat: %s\nCarbs: %s",
-            energy, protein, fat, carbs);
-            resultLabel.setText(result);
-            Image mealThumb = new Image(mealImg);
-            dishImg.setImage(mealThumb);
-        } catch (Exception e) {
-            return;
-        }
-    }
 
-    public RandomRecipe getRandomDish(String query) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://www.themealdb.com/api/json/v1/1/filter.php?c=" + query))
-            .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        Gson gson = new Gson();
-        RandomRecipe randomDish = gson.fromJson(response.body(), RandomRecipe.class);
-        size = randomDish.getMeals().size();
-        System.out.println(size);
-        return randomDish;
-    }
-
-    public EdamamResponse getFoodItem(String mealName) throws IOException, InterruptedException {
-        String apiKey = "8b8990c5e53c9caf9a1202885abb11ce";
-        String apiId = "728f2e2a";
-        String apiEndpoint = "https://api.edamam.com/api/food-database/v2/parser";
-        String encodedDishName = URLEncoder.encode(mealName, StandardCharsets.UTF_8);
-        String requestBody = "{\"ingr\":[\"" + encodedDishName + "\"]}";
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(apiEndpoint + "?app_id=" + apiId + "&app_key="
-            + apiKey + "&ingr=" + encodedDishName))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
-            .build();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        Gson gson = new Gson();
-        EdamamResponse foodItem = gson.fromJson(response.body(), EdamamResponse.class);
-        return foodItem;
-        } */
 } // ApiApp
