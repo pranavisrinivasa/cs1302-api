@@ -64,6 +64,9 @@ public class ApiApp extends Application {
     String result;
     String mealImg;
     int size;
+    Label resultLabel = new Label();
+    Label mealLabel = new Label();
+    ImageView dishImg = new ImageView();
 
 //    String result;
 
@@ -83,25 +86,17 @@ public class ApiApp extends Application {
 
     @Override
     public void start(Stage stage) {
-
         this.stage = stage;
-
-        // demonstrate how to load local asset using "file:resources/"
         Image bannerImage = new Image("file:resources/banner.png");
         Image boxLeft = new Image("file:resources/box.png");
         Image boxRight = new Image("file:resources/box.png");
-        // Image mealThumb = new Image();
         ImageView banner = new ImageView(bannerImage);
         ImageView imgLeft = new ImageView(boxLeft);
         ImageView imgRight = new ImageView(boxRight);
-        ImageView dishImg = new ImageView();
         TextField searchBar = new TextField("type your query here");
         Button searchButton = new Button("Search");
-        Label resultLabel = new Label();
-        Label mealLabel = new Label();
         Label instructions = new Label("Can't figure out what dish to make? \n Choose a category " +
             "and get a random dish that you \n can make along with its nutritional value");
-
         searchButton.setDisable(true);
         banner.setPreserveRatio(true);
         banner.setFitWidth(640);
@@ -112,25 +107,19 @@ public class ApiApp extends Application {
         dishImg.setPreserveRatio(true);
         dishImg.setFitWidth(300);
         dishImg.setFitHeight(200);
-        mealLabel.setStyle("-fx-font-size: 20px;");
+        mealLabel.setStyle("-fx-font-size: 14px;");
         mealLabel.setUnderline(true);
         resultLabel.setStyle("-fx-font-weight: bold;");
         instructions.setStyle("-fx-font-weight: bold; -fx-text-alignment: center;");
         instr.setAlignment(Pos.CENTER);
-//        instr.setBackground(new Background(new BackgroundFill(Color.LIGHTBROWN,
-        //          CornerRadii.EMPTY, Insets.EMPTY)));
         instr.setStyle("-fx-background-color: #ffda7c;");
-
-        //make comboBox
         categoryComboBox.getItems().addAll("Dessert", "Seafood", "Side",
             "Starter", "Vegan", "Vegetarian");
         categoryComboBox.getSelectionModel().selectFirst();
         categoryComboBox.setValue("Choose food group!");
-        // setup scene
         categoryComboBox.setOnAction(event -> {
             searchButton.setDisable(false);
         });
-
         bar.getChildren().addAll(categoryComboBox, searchButton);
         left.getChildren().addAll(mealLabel, dishImg);
         right.getChildren().addAll(resultLabel);
@@ -143,77 +132,79 @@ public class ApiApp extends Application {
         hbox.getChildren().addAll(sp, spR);
         root.getChildren().addAll(banner, instr, bar, hbox);
         scene = new Scene(root, 640, 680);
-
-        // setup stage
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();
         stage.show();
-
-
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
-
                 @Override
-                public void handle(ActionEvent event) {
-                    query = categoryComboBox.getValue().toString();
-                    HttpClient client = HttpClient.newHttpClient();
-                    HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("https://www.themealdb.com/api/json/v1/1/filter.php?c=" + query))
-                        .build();
-                    HttpResponse<String> response;
-                    try {
-                        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                        Gson gson = new Gson();
-                        RandomRecipe randomDish = gson.fromJson(response.body(),RandomRecipe.class);
-                        Random random = new Random();
-                        size = randomDish.getMeals().size();
-                        int randomNumber = random.nextInt(size);
-                        mealName = randomDish.getMeals().get(randomNumber).getStrMeal();
-                        mealImg = randomDish.getMeals().get(randomNumber).getStrMealThumb();
-                        mealLabel.setText(mealName);
-                    } catch (Exception e) {
-                        return;
-                    }
-                    String apiKey = "8b8990c5e53c9caf9a1202885abb11ce";
-                    String apiId = "728f2e2a";
-                    String apiEndpoint = "https://api.edamam.com/api/food-database/v2/parser";
-                    String encodedDishName = URLEncoder.encode(mealName, StandardCharsets.UTF_8);
-                    String requestBody = "{\"ingr\":[\"" + encodedDishName + "\"]}";
-                    HttpRequest request2 = HttpRequest.newBuilder()
-                        .uri(URI.create(apiEndpoint + "?app_id=" + apiId + "&app_key="
-                        + apiKey + "&ingr=" + encodedDishName))
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .build();
-                    HttpResponse<String> response2;
-                    try {
-                        response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-                        Gson gson = new Gson();
-                        EdamamResponse foodItem = gson.fromJson(response2.body(),
-                            EdamamResponse.class);
-                        Gson gson2 = new Gson();
-                        Map<String, Object> map = gson2.fromJson(response2.body(), Map.class);
-                        List<Map<String, Object>> hints = (List<Map<String, Object>>)
-                            map.get("hints");
-                        Map<String, Object> food = (Map<String, Object>) hints.get(1).get("food");
-                        Map<String, Object> nutrients = (Map<String, Object>) food.get("nutrients");
-                        String energy = ((Double) nutrients.get("ENERC_KCAL")).intValue() + " kcal";
-                        String protein = nutrients.get("PROCNT") + " g";
-                        String fat = nutrients.get("FAT") + " g";
-                        String carbs = nutrients.get("CHOCDF") + " g";
-                        result = String.format("Energy: %s\nProtein: %s\nFat: %s\nCarbs: %s"
-                        , energy, protein, fat, carbs);
-                        resultLabel.setText(result);
-                    } catch (Exception e) {
-                        return;
-                    }
-                    Image mealThumb = new Image(mealImg);
-                    dishImg.setImage(mealThumb);
-                } // handle;
-            });
-
+        public void handle(ActionEvent event) {
+                handleSearch();
+            }
+        });
     } // start
 
+    /**
+     * uses the user input to send requests to the apis to retrieve the nesessary information
+     * for the GUI.
+     */
+    public void handleSearch() {
+        query = categoryComboBox.getValue().toString();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://www.themealdb.com/api/json/v1/1/filter.php?c=" + query))
+            .build();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            Gson gson = new Gson();
+            RandomRecipe randomDish = gson.fromJson(response.body(),RandomRecipe.class);
+            Random random = new Random();
+            size = randomDish.getMeals().size();
+            int randomNumber = random.nextInt(size);
+            mealName = randomDish.getMeals().get(randomNumber).getStrMeal();
+            mealImg = randomDish.getMeals().get(randomNumber).getStrMealThumb();
+            mealLabel.setText(mealName);
+        } catch (Exception e) {
+            return;
+        }
+
+        String apiKey = "8b8990c5e53c9caf9a1202885abb11ce";
+        String apiId = "728f2e2a";
+        String apiEndpoint = "https://api.edamam.com/api/food-database/v2/parser";
+        String encodedDishName = URLEncoder.encode(mealName, StandardCharsets.UTF_8);
+        String requestBody = "{\"ingr\":[\"" + encodedDishName + "\"]}";
+        HttpRequest request2 = HttpRequest.newBuilder()
+            .uri(URI.create(apiEndpoint + "?app_id=" + apiId + "&app_key="
+            + apiKey + "&ingr=" + encodedDishName))
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
+            .build();
+        HttpResponse<String> response2;
+        try {
+            response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+            Gson gson = new Gson();
+            EdamamResponse foodItem = gson.fromJson(response2.body(),
+                EdamamResponse.class);
+            Gson gson2 = new Gson();
+            Map<String, Object> map = gson2.fromJson(response2.body(), Map.class);
+            List<Map<String, Object>> hints = (List<Map<String, Object>>)
+                map.get("hints");
+            Map<String, Object> food = (Map<String, Object>) hints.get(1).get("food");
+            Map<String, Object> nutrients = (Map<String, Object>) food.get("nutrients");
+            String energy = ((Double) nutrients.get("ENERC_KCAL")).intValue() + " kcal";
+            String protein = nutrients.get("PROCNT") + " g";
+            String fat = nutrients.get("FAT") + " g";
+            String carbs = nutrients.get("CHOCDF") + " g";
+            result = String.format("Energy: %s\nProtein: %s\nFat: %s\nCarbs: %s"
+            , energy, protein, fat, carbs);
+            resultLabel.setText(result);
+        } catch (Exception e) {
+            return;
+        }
+        Image mealThumb = new Image(mealImg);
+        dishImg.setImage(mealThumb);
+    }
 } // ApiApp
