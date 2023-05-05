@@ -87,7 +87,7 @@ public class ApiApp extends Application {
         this.stage = stage;
 
         // demonstrate how to load local asset using "file:resources/"
-        Image bannerImage = new Image("file:resources/header.png");
+        Image bannerImage = new Image("file:resources/banner.png");
         Image boxLeft = new Image("file:resources/box.png");
         Image boxRight = new Image("file:resources/box.png");
         // Image mealThumb = new Image();
@@ -144,6 +144,7 @@ public class ApiApp extends Application {
         // setup stage
         stage.setTitle("ApiApp!");
         stage.setScene(scene);
+        // stage.setResizable(false);
         stage.setOnCloseRequest(event -> Platform.exit());
         stage.sizeToScene();
         stage.show();
@@ -154,7 +155,6 @@ public class ApiApp extends Application {
                 @Override
                 public void handle(ActionEvent event) {
                     query = categoryComboBox.getValue().toString();
-                    System.out.println("User query: " + query);
                     HttpClient client = HttpClient.newHttpClient();
                     HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("https://www.themealdb.com/api/json/v1/1/filter.php?c=" + query))
@@ -163,21 +163,16 @@ public class ApiApp extends Application {
                     try {
                         response = client.send(request, HttpResponse.BodyHandlers.ofString());
                         Gson gson = new Gson();
-//                        String responseBody = response.body();
                         RandomRecipe randomDish = gson.fromJson(response.body(),RandomRecipe.class);
                         Random random = new Random();
                         size = randomDish.getMeals().size();
-                        System.out.println(size);
                         int randomNumber = random.nextInt(size);
-                        System.out.println(randomNumber);
                         mealName = randomDish.getMeals().get(randomNumber).getStrMeal();
                         mealImg = randomDish.getMeals().get(randomNumber).getStrMealThumb();
                         mealLabel.setText(mealName);
-                        System.out.println(mealImg);
                     } catch (Exception e) {
                         return;
                     }
-
                     String apiKey = "8b8990c5e53c9caf9a1202885abb11ce";
                     String apiId = "728f2e2a";
                     String apiEndpoint = "https://api.edamam.com/api/food-database/v2/parser";
@@ -192,7 +187,6 @@ public class ApiApp extends Application {
                     HttpResponse<String> response2;
                     try {
                         response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-                        // String responseBody = response2.body();
                         Gson gson = new Gson();
                         EdamamResponse foodItem = gson.fromJson(response2.body(),
                             EdamamResponse.class);
@@ -212,7 +206,6 @@ public class ApiApp extends Application {
                     } catch (Exception e) {
                         return;
                     }
-                    System.out.println(searchBar);
                     Image mealThumb = new Image(mealImg);
                     dishImg.setImage(mealThumb);
                 } // handle;
