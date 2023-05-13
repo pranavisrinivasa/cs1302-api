@@ -25,6 +25,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.Scene;
@@ -64,6 +66,8 @@ public class ApiApp extends Application {
     String result;
     String mealImg;
     int size;
+    String id;
+    String strInstr;
     Label resultLabel = new Label();
     Label mealLabel = new Label();
     ImageView dishImg = new ImageView();
@@ -95,8 +99,10 @@ public class ApiApp extends Application {
         ImageView imgRight = new ImageView(boxRight);
         TextField searchBar = new TextField("type your query here");
         Button searchButton = new Button("Search");
+        Button getInstr = new Button("Get Recipe!");
         Label instructions = new Label("Can't figure out what dish to make? \n Choose a category " +
             "and get a random dish that you \n can make along with its nutritional value");
+        getInstr.setVisible(false);
         searchButton.setDisable(true);
         banner.setPreserveRatio(true);
         banner.setFitWidth(640);
@@ -122,7 +128,7 @@ public class ApiApp extends Application {
         });
         bar.getChildren().addAll(categoryComboBox, searchButton);
         left.getChildren().addAll(mealLabel, dishImg);
-        right.getChildren().addAll(resultLabel);
+        right.getChildren().addAll(resultLabel, getInstr);
         instr.getChildren().addAll(instructions);
         StackPane spR = new StackPane(imgRight, right);
         StackPane sp = new StackPane(imgLeft, left);
@@ -140,10 +146,28 @@ public class ApiApp extends Application {
         stage.show();
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
-        public void handle(ActionEvent event) {
-                handleSearch();
-            }
-        });
+                public void handle(ActionEvent event) {
+                    handleSearch();
+                    getInstr.setVisible(true);
+                }
+            });
+
+        getInstr.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    Alert alert = new Alert(AlertType.INFORMATION);
+
+                    // Set the title and message text for the Alert
+                    alert.setTitle("Recipe!");
+                    alert.setHeaderText(null);
+                    alert.setContentText(strInstr);
+
+                    // Show the Alert dialog and wait for the user to close it
+                    alert.showAndWait();
+                }
+
+            });
+
     } // start
 
     /**
@@ -166,10 +190,28 @@ public class ApiApp extends Application {
             int randomNumber = random.nextInt(size);
             mealName = randomDish.getMeals().get(randomNumber).getStrMeal();
             mealImg = randomDish.getMeals().get(randomNumber).getStrMealThumb();
+            id = randomDish.getMeals().get(randomNumber).getIdMeal();
+            System.out.println(id);
             mealLabel.setText(mealName);
         } catch (Exception e) {
             return;
         }
+
+
+        HttpRequest request3 = HttpRequest.newBuilder()
+            .uri(URI.create("https://www.themealdb.com/api/json/v1/1/lookup.php?i=" + id))
+            .build();
+        HttpResponse<String> response3;
+        try {
+            response3 = client.send(request3, HttpResponse.BodyHandlers.ofString());
+            Gson gson = new Gson();
+            RandomRecipe instr = gson.fromJson(response3.body(),RandomRecipe.class);
+            strInstr = instr.getMeals().get(0).getStrInstructions();
+            System.out.println(strInstr);
+        } catch (Exception e) {
+            return;
+        }
+
 
         String apiKey = "8b8990c5e53c9caf9a1202885abb11ce";
         String apiId = "728f2e2a";
@@ -207,4 +249,5 @@ public class ApiApp extends Application {
         Image mealThumb = new Image(mealImg);
         dishImg.setImage(mealThumb);
     }
+
 } // ApiApp

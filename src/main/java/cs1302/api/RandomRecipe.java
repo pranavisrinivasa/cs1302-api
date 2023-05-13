@@ -6,6 +6,8 @@ import java.util.List;
  * class that gets and sets the name of the meals and stores it in a list of meals.
  */
 public class RandomRecipe {
+    private String idMeal;
+    private String strInstructions;
     private List<Meal> meals;
 
     /**
@@ -16,7 +18,6 @@ public class RandomRecipe {
         return meals;
     }
 
-
     /**
      * sets the list of meals.
      * @param meals
@@ -25,6 +26,21 @@ public class RandomRecipe {
         this.meals = meals;
     }
 
+    public String getIdMeal() {
+        return idMeal;
+    }
+
+    public void setIdMeal() {
+        this.idMeal = idMeal;
+    }
+
+    /*  public String getStrInstructions() {
+        return strInstructions;
+    }
+
+    public void setStrInstructions() {
+        this.strInstructions = strInstructions;
+        }*/
 
     /**
      * class that sets and gets information about the meals.
@@ -32,11 +48,21 @@ public class RandomRecipe {
     public static class Meal {
         private String strMeal;
         private String strMealThumb;
+        private String idMeal;
+        private String strInstructions;
 
         /**
          * returns the name of the meal that was generated.
          * @return strMeal
          */
+        public String getIdMeal() {
+            return idMeal;
+        }
+
+        public void setIdMeal() {
+            this.idMeal = idMeal;
+        }
+
         public String getStrMeal() {
             return strMeal;
         }
@@ -63,6 +89,15 @@ public class RandomRecipe {
         public void setStrMealThumb() {
             this.strMealThumb = strMealThumb;
         }
+
+        public String getStrInstructions() {
+            return strInstructions;
+        }
+
+        public void setStrInstructions() {
+            this.strInstructions = strInstructions;
+        }
+
 
     }
 }
